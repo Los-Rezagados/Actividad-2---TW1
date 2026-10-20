@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🏫 Actividad 2 — Infraestructura Web Segura y DNS Avanzado
+# 🛡️ Actividad 2 — Infraestructura Web Segura y DNS Avanzado
 ### Servidor Web U.E. Horizonte - Fase 2 (Laboratorios 5 al 8)
 
 [![Ubuntu](https://img.shields.io/badge/Ubuntu_24.04-E95420?style=for-the-badge&logo=ubuntu&logoColor=white)](https://ubuntu.com/)
@@ -18,39 +18,36 @@
 ---
 
 ## 📋 Tabla de Contenidos
-1. [Resumen del Proyecto](#-resumen-del-proyecto)
+1. [Resumen Ejecutivo](#-resumen-ejecutivo)
 2. [Arquitectura de la Infraestructura](#-arquitectura-de-la-infraestructura)
-3. [Desglose Técnico por Laboratorio](#-desglose-técnico-por-laboratorio)
+3. [Desglose Técnico (Labs 5 al 8)](#-desglose-técnico-labs-5-al-8)
 4. [Seguridad y Hardening (Deep Dive)](#-seguridad-y-hardening-deep-dive)
 5. [Estructura del Repositorio](#-estructura-del-repositorio)
-6. [Documentación Adjunta (PDFs)](#-documentación-adjunta-pdfs)
+6. [Documentación Adjunta](#-documentación-adjunta)
 7. [Integrantes del Equipo](#-integrantes-del-equipo)
 
 ---
 
-## 🎯 Resumen del Proyecto
+## 🎯 Resumen Ejecutivo
 
-Este repositorio consolida la **Fase 2** del proyecto de infraestructura para la **U.E. Horizonte**. A través de un entorno completamente orquestado con **Docker**, se ha construido un ecosistema de red que abarca desde la seguridad criptográfica de las aplicaciones web hasta la administración de servidores DNS autoritativos y resolutores con altos estándares de seguridad.
+Este repositorio representa la culminación de la **Fase 2** del proyecto de infraestructura para la **U.E. Horizonte**. Mientras que la primera fase (Actividad 1) estableció las bases del servidor web y las aplicaciones, esta segunda fase se enfoca en la **seguridad de la capa de transporte, la auditoría de redes y el despliegue de una infraestructura DNS robusta**. 
 
-El sistema garantiza que el portal de padres viaje cifrado por HTTPS, que la red interna del colegio esté protegida contra ataques de *Spoofing* (suplantación), y que la navegación de los estudiantes esté filtrada contra dominios maliciosos mediante políticas de DNS.
+Todo el ecosistema ha sido orquestado utilizando **Docker** para garantizar la portabilidad, desplegando una red interna que integra servidores web con TLS 1.3, servidores DNS autoritativos (BIND9) sincronizados de forma segura y un resolutor con filtrado de contenido y cifrado de consultas.
 
 ---
 
 ## 🏗️ Arquitectura de la Infraestructura
 
-El proyecto se despliega sobre una red Docker aislada (`red_dns` en 10.10.10.0/24) que interconecta múltiples servicios críticos.
-
-*(Recomendación: Sube una foto de tu diagrama de red a una carpeta llamada `img/` en tu repositorio y descomenta la siguiente línea para que se vea tu propio diagrama)*
-<!-- ![Diagrama de Arquitectura](./img/diagrama-red.png) -->
+El sistema se compone de dos grandes bloques interconectados: el entorno Web Seguro y la Red DNS Interna.
 
 ```mermaid
 graph TD
     %% Capa Web (Lab 5)
-    Client[Navegador del Padre] -->|HTTPS :8443| Nginx{Nginx Web Server<br>CA Propia / TLS 1.3}
+    Client[Cliente / Navegador] -->|HTTPS :8443| Nginx{Nginx Reverse Proxy<br>CA Propia / TLS 1.3}
     Nginx -->|Proxy / FastCGI| Apps[Portal PHP / API Python]
     
     %% Capa DNS (Labs 6, 7, 8)
-    subgraph Red DNS Interna (10.10.10.0/24)
+    subgraph Red DNS Interna - 10.10.10.0/24
         ClienteDNS[Cliente DNS<br>10.10.10.50] -->|Consultas :53| Resolutor[Unbound Resolutor<br>10.10.10.4]
         
         Resolutor -->|Stub-Zone| NS1[ns1 BIND9 Primario<br>10.10.10.2]
